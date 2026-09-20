@@ -2,6 +2,26 @@ import tkinter as tk
 from tkinter import messagebox
 import numpy as np
 
+def borrar_valores():
+    # Limpiamos las matrices iterando por las 4 filas
+    for i in range(4):
+        # Limpiar matriz A
+        for j in range(4):
+            entradas_A[i][j].delete(0, tk.END)
+        
+        # Limpiar vector b
+        entradas_b[i].delete(0, tk.END)
+        
+        # Limpiar vector x (desbloqueando y volviendo a bloquear)
+        entradas_x[i].config(state=tk.NORMAL)
+        entradas_x[i].delete(0, tk.END)
+        entradas_x[i].config(state="readonly")
+        
+    # Limpiar el campo del determinante
+    entrada_det.config(state=tk.NORMAL)
+    entrada_det.delete(0, tk.END)
+    entrada_det.config(state="readonly")
+
 root = tk.Tk()
 root.title("Laboratorio de Matrices")
 root.geometry("800x450")
