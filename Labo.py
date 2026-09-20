@@ -3,24 +3,45 @@ from tkinter import messagebox
 import numpy as np
 
 def borrar_valores():
-    # Limpiamos las matrices iterando por las 4 filas
     for i in range(4):
-        # Limpiar matriz A
         for j in range(4):
             entradas_A[i][j].delete(0, tk.END)
         
-        # Limpiar vector b
         entradas_b[i].delete(0, tk.END)
         
-        # Limpiar vector x (desbloqueando y volviendo a bloquear)
         entradas_x[i].config(state=tk.NORMAL)
         entradas_x[i].delete(0, tk.END)
         entradas_x[i].config(state="readonly")
         
-    # Limpiar el campo del determinante
     entrada_det.config(state=tk.NORMAL)
     entrada_det.delete(0, tk.END)
     entrada_det.config(state="readonly")
+
+def calcular_determinante():
+    try:
+        n = dimension_var.get()
+        
+        matriz_A = []
+        for i in range(n):
+            fila = []
+            for j in range(n):
+                valor_texto = entradas_A[i][j].get()
+                valor_texto = valor_texto.replace(',', '.') 
+                fila.append(float(valor_texto))
+            matriz_A.append(fila)
+            
+        A = np.array(matriz_A)
+        det = np.linalg.det(A)
+        
+        entrada_det.config(state=tk.NORMAL)
+        entrada_det.delete(0, tk.END)
+        if abs(det) < 1e-10: 
+            det = 0.0
+        entrada_det.insert(0, f"{det:.4f}")
+        entrada_det.config(state="readonly")
+        
+    except ValueError:
+        messagebox.showerror("Error de carga", f"Por favor, ingresá números válidos en todos los campos de la matriz {n}x{n}.")
 
 root = tk.Tk()
 root.title("Laboratorio de Matrices")
@@ -85,7 +106,7 @@ label_ayuda.pack(pady=(0, 15))
 frame_botones = tk.Frame(frame_inferior)
 frame_botones.pack(pady=5)
 
-btn_borrar = tk.Button(frame_botones, text="Borrar valores")
+btn_borrar = tk.Button(frame_botones, text="Borrar valores", command=borrar_valores)
 btn_borrar.grid(row=0, column=0, padx=10)
 
 btn_calcular = tk.Button(frame_botones, text="Calcular")
@@ -99,7 +120,7 @@ tk.Label(frame_det, text="Determinante:").grid(row=0, column=0, padx=5)
 entrada_det = tk.Entry(frame_det, width=10, justify="center", state="readonly")
 entrada_det.grid(row=0, column=1, padx=5)
 
-btn_calc_det = tk.Button(frame_det, text="Calcular det.")
+btn_calc_det = tk.Button(frame_det, text="Calcular det.", command=calcular_determinante)
 btn_calc_det.grid(row=0, column=2, padx=5)
 
 root.mainloop()
