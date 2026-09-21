@@ -42,7 +42,59 @@ def calcular_determinante():
         
     except ValueError:
         messagebox.showerror("Error de carga", f"Por favor, ingresá números válidos en todos los campos de la matriz {n}x{n}.")
-
+        
+def calcular_sistema():
+    try:
+        n = dimension_var.get()
+        
+        # 1. Leer la matriz A y el vector b
+        matriz_A = []
+        vector_b = []
+        
+        for i in range(n):
+            fila = []
+            for j in range(n):
+                val_A = entradas_A[i][j].get().replace(',', '.')
+                fila.append(float(val_A))
+            matriz_A.append(fila)
+            
+            val_b = entradas_b[i].get().replace(',', '.')
+            vector_b.append(float(val_b))
+            
+        A = np.array(matriz_A)
+        b = np.array(vector_b)
+        
+        # 2. Calcular el determinante de la matriz original
+        det_A = np.linalg.det(A)
+        
+        # Validar que el sistema sea compatible determinado
+        if abs(det_A) < 1e-10:
+            messagebox.showwarning("Atención", "El determinante es 0. El sistema no tiene una solución única.")
+            return
+            
+        # 3. Aplicar la Regla de Cramer
+        for i in range(n):
+            # Crear una copia de A y reemplazar la columna i por el vector b
+            Ai = A.copy()
+            Ai[:, i] = b
+            
+            # Calcular el determinante de Ai y obtener la incógnita
+            det_Ai = np.linalg.det(Ai)
+            xi = det_Ai / det_A
+            
+            # 4. Mostrar el resultado en los campos del vector x
+            entradas_x[i].config(state=tk.NORMAL)
+            entradas_x[i].delete(0, tk.END)
+            
+            if abs(xi) < 1e-10:
+                xi = 0.0
+                
+            entradas_x[i].insert(0, f"{xi:.4f}")
+            entradas_x[i].config(state="readonly")
+            
+    except ValueError:
+        # Manejo de excepciones por errores de carga
+        messagebox.showerror("Error de carga", f"Verificá que los campos de A y b de la matriz {n}x{n} tengan números válidos.")
 root = tk.Tk()
 root.title("Laboratorio de Matrices")
 root.geometry("800x450")
@@ -109,7 +161,7 @@ frame_botones.pack(pady=5)
 btn_borrar = tk.Button(frame_botones, text="Borrar valores", command=borrar_valores)
 btn_borrar.grid(row=0, column=0, padx=10)
 
-btn_calcular = tk.Button(frame_botones, text="Calcular")
+btn_calcular = tk.Button(frame_botones, text="Calcular", command=calcular_sistema)
 btn_calcular.grid(row=0, column=1, padx=10)
 
 frame_det = tk.Frame(frame_inferior)
